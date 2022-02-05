@@ -4,7 +4,7 @@ namespace App;
 
 class PseudoCrud
 {
-    public static $_db = array();
+	private static $_db = array();
 
     public static function create($value_dictionary)
     {

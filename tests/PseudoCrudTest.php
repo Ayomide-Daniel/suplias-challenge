@@ -9,15 +9,17 @@ use PHPUnit\Framework\Error\Notice;
 class PseudoCrudTest extends TestCase
 {
     protected $pseudo_crud;
+    protected static $pseudo_crud_read_all;
 
     public function setUp():void
     {
         $this->pseudo_crud = new PseudoCrud();
+        self::$pseudo_crud_read_all = $this->pseudo_crud::read_all();
     }
 
     // public function tearDown():void
     // {
-    //     PseudoCrud::$_db = array();
+    //     self::$pseudo_crud_read_all = array();
     // }
 
 
@@ -38,7 +40,7 @@ class PseudoCrudTest extends TestCase
 
         $pseudo_crud_create = $this->pseudo_crud::create($value_dictionary);
 
-        $this->assertEquals($pseudo_crud_create, count($this->pseudo_crud::$_db));
+        $this->assertEquals($pseudo_crud_create, count(self::$pseudo_crud_read_all) + 1);
     }
 
 
@@ -52,7 +54,7 @@ class PseudoCrudTest extends TestCase
 
         $pseudo_crud_read = $this->pseudo_crud::read($id);
         $obj = null;
-        foreach ($this->pseudo_crud::$_db as $key => $item) {
+        foreach (self::$pseudo_crud_read_all as $key => $item) {
             if ($item['id'] == $id) {
                 $obj = $item;
             }
@@ -73,7 +75,7 @@ class PseudoCrudTest extends TestCase
 
         $objects_found = [];
 
-        foreach ($this->pseudo_crud::$_db as $item) {
+        foreach (self::$pseudo_crud_read_all as $item) {
             if ($item[$key] == $value) {
                 $objects_found[] = $item;
             }
@@ -101,7 +103,7 @@ class PseudoCrudTest extends TestCase
 
         $pseudo_crud_update = $this->pseudo_crud::update($id, $value_dictionary);
 
-        foreach ($this->pseudo_crud::$_db as $key => $item) {
+        foreach (self::$pseudo_crud_read_all as $key => $item) {
             if ($item['id'] == $id) {
                 foreach ($value_dictionary as $key => $value) {
                     $item[$key] = $value;
@@ -110,7 +112,7 @@ class PseudoCrudTest extends TestCase
             }
         }
 
-        $count_pseudo_crud = count($this->pseudo_crud::$_db);
+        $count_pseudo_crud = count(self::$pseudo_crud_read_all);
         $this->assertSame($status, $pseudo_crud_update);
 
 
@@ -118,7 +120,7 @@ class PseudoCrudTest extends TestCase
 
             $this->expectNotice(Notice::class);
 
-            $this->assertIsArray($this->pseudo_crud::$_db[$id - 1], "assert if \$_db element with \$id of " . $id . " exits (as an array)");
+            $this->assertIsArray(self::$pseudo_crud_read_all[$id - 1], "assert if \$_db element with \$id of " . $id . " exits (as an array)");
         }
     }
 
@@ -128,13 +130,13 @@ class PseudoCrudTest extends TestCase
     public function test_if_pseudo_crud_can_delete()
     {
         $id = 1;
-        $pseudo_crud_items = $this->pseudo_crud::$_db;
+        $pseudo_crud_items = self::$pseudo_crud_read_all;
         $pseudo_crud_delete = $this->pseudo_crud::delete($id);
 
         if ($pseudo_crud_delete == true) {
-            $this->assertCount(count($pseudo_crud_items) -1 , $this->pseudo_crud::$_db);
+            $this->assertCount(count($pseudo_crud_items) -1 , $this->pseudo_crud::read_all());
         }else{
-            $this->assertCount(count($pseudo_crud_items) , $this->pseudo_crud::$_db);
+            $this->assertCount(count($pseudo_crud_items) , $this->pseudo_crud::read_all());
         }
     }
 
@@ -143,6 +145,6 @@ class PseudoCrudTest extends TestCase
      */
     public function test_if_pseudo_crud_can_view()
     {
-        $this->assertSame(json_encode($this->pseudo_crud::$_db), $this->pseudo_crud::view());
+        $this->assertSame(json_encode(self::$pseudo_crud_read_all), $this->pseudo_crud::view());
     }
 }
