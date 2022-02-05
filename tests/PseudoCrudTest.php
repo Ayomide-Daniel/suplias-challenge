@@ -14,6 +14,8 @@ class PseudoCrudTest extends TestCase
     public function setUp():void
     {
         $this->pseudo_crud = new PseudoCrud();
+
+        // this reads the private static property-- $_db by using the read_all() function specified in the class
         self::$pseudo_crud_read_all = $this->pseudo_crud::read_all();
     }
 
